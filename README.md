@@ -8,5 +8,5 @@
 Move the GoogleService-Info.plist file you just downloaded into the root of your Xcode project and add it to all targets.
 - https://firebase.google.com/docs/ios/setup
 
-### ToDO 
+### ToDo
 - https://github.com/exyte/Chat?tab=readme-ov-file
