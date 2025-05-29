@@ -1,5 +1,5 @@
 # chatzero
-#
+
 - https://firebase.google.com/docs/ai-logic/generate-text?api=dev
 - https://github.com/firebase/quickstart-ios/tree/main/firebaseai
 #
@@ -9,4 +9,4 @@ Move the GoogleService-Info.plist file you just downloaded into the root of your
 - https://firebase.google.com/docs/ios/setup
 
 ### ToDo
-- https://github.com/exyte/Chat?tab=readme-ov-file
+- https://github.com/MessageKit/MessageKit
