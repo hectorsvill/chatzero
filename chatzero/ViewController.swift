@@ -8,33 +8,52 @@
 import UIKit
 
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     let googleGen = GoogleGen()
-    let storyTextView = UITextView()
-    let fetchButton = UIButton(type: .system)
     let activityIndicator = UIActivityIndicatorView(style: .large)
+    let tableview = UITableView()
+    let chatMessages = ["Chat with gemini"]
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setupUI()
     }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return chatMessages.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "cell") else {
+            return UITableViewCell(style: .default, reuseIdentifier: "cell")
+        }
+        
+        cell.textLabel?.text = chatMessages[indexPath.row]
+        
+        return  cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+//        print("selcted row: \(indexPath.row)")
+        tableView.deselectRow(at: indexPath, animated: true)
+        let vc = ChatViewController()
+        navigationController?.pushViewController(vc, animated: true)
+        
+    }
+    
 
     func setupUI() {
-        view.backgroundColor = .white
-
-        // Configure TextView
-        storyTextView.isEditable = false
-        storyTextView.font = UIFont.systemFont(ofSize: 16)
-        storyTextView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(storyTextView)
-
-        // Configure Button
-        fetchButton.setTitle("Fetch Story", for: .normal)
-        fetchButton.addTarget(self, action: #selector(fetchStoryTapped), for: .touchUpInside)
-        fetchButton.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(fetchButton)
-
+        tableview.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        tableview.delegate = self
+        tableview.dataSource = self
+        // Configure table view
+        title = "ChatZero"
+        view.backgroundColor = .systemBackground
+        view.addSubview(tableview)
+        // disable autoresizing mask tranlation to us constrainst
+        tableview.translatesAutoresizingMaskIntoConstraints = false
+        
         // Configure Activity Indicator
         activityIndicator.hidesWhenStopped = true
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
@@ -42,14 +61,11 @@ class ViewController: UIViewController {
 
         // Set up Constraints
         NSLayoutConstraint.activate([
-            storyTextView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            storyTextView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
-            storyTextView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
-            storyTextView.bottomAnchor.constraint(equalTo: fetchButton.topAnchor, constant: -20),
-
-            fetchButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            fetchButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
-
+            tableview.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            tableview.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            tableview.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            tableview.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            
             activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
@@ -57,11 +73,10 @@ class ViewController: UIViewController {
 
     @objc func fetchStoryTapped() {
         activityIndicator.startAnimating()
-        storyTextView.text = "Fetching story..."
         Task {
             await googleGen.fetchContent()
             activityIndicator.stopAnimating()
-            self.storyTextView.text = googleGen.text
+//            self.storyTextView.text = googleGen.text
         }
     }
 
