@@ -6,24 +6,70 @@
 //
 
 import UIKit
+import MessageKit
 
-class ChatViewController: UIViewController {
+struct Sender: SenderType {
+    var senderId: String
+    var displayName: String
+}
 
+struct Message: MessageType {
+    var sender: SenderType
+    var messageId: String
+    var sentDate: Date
+    var kind: MessageKind
+}
+
+class ChatViewController: MessagesViewController, MessagesDataSource, MessagesLayoutDelegate, MessagesDisplayDelegate {
+    var currentUser = Sender(senderId: "self", displayName: "me")
+    var aisender = Sender(senderId: "id2", displayName: "gemini")
+    var messages = [MessageType]()
+
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
+        
+        
+        messages.append(Message(sender: currentSender,
+                                messageId: UUID().uuidString,
+                                sentDate: Date().addingTimeInterval(-26400),
+                                kind: .text("ok")))
+        messages.append(Message(sender: aisender,
+                                messageId:  UUID().uuidString,
+                                sentDate: Date().addingTimeInterval(-26430),
+                                kind: .text("what?")))
+        messages.append(Message(sender: currentSender,
+                                messageId:  UUID().uuidString,
+                                sentDate: Date().addingTimeInterval(-26300),
+                                kind: .text("Why are you here")))
+        messages.append(Message(sender: aisender,
+                                messageId: UUID().uuidString,
+                                sentDate: Date().addingTimeInterval(-26330),
+                                kind: .text("Because i am ai?")))
+        
+        
+        
+        
+        messagesCollectionView.messagesDataSource = self
+        messagesCollectionView.messagesLayoutDelegate = self
+        messagesCollectionView.messagesDisplayDelegate = self
+        
+        // !! Reload collection view to dsiplay data
+        messagesCollectionView.reloadData()
+        messagesCollectionView.scrollToLastItem(animated: false)
     }
     
 
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    var currentSender: SenderType {
+        return currentUser
     }
-    */
+
+    func numberOfSections(in messagesCollectionView: MessagesCollectionView) -> Int {
+        return messages.count
+    }
+
+    func messageForItem(at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageType {
+        return messages[indexPath.section]
+    }
 
 }
